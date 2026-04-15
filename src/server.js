@@ -1,13 +1,13 @@
 const express = require('express');
 const path = require('path');
 const Parser = require('rss-parser');
+const { JSDOM } = require('jsdom');
+const { Readability } = require('@mozilla/readability');
 
 const app = express();
 const parser = new Parser({
   timeout: 15000,
-  headers: {
-    'User-Agent': 'Mozilla/5.0 (compatible; EetaramBot/1.0)'
-  }
+  headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EetaramBot/1.0)' }
 });
 
 const PORT = process.env.PORT || 3000;
@@ -58,8 +58,10 @@ const FEEDS = {
   ]
 };
 
-const cache = new Map();
-const TTL_MS = 5 * 60 * 1000;
+const newsCache = new Map();
+const articleCache = new Map();
+const NEWS_TTL_MS = 5 * 60 * 1000;
+const ARTICLE_TTL_MS = 30 * 60 * 1000;
 
 function stripHtml(input = '') {
   return String(input)
@@ -93,20 +95,33 @@ function timeValue(pubDate) {
   return isNaN(d) ? 0 : d.getTime();
 }
 
+function splitParagraphs(text='') {
+  const cleaned = sentenceCase(text);
+  const sentences = cleaned.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
+  const paras = [];
+  for (let i = 0; i < sentences.length; i += 3) {
+    const chunk = sentences.slice(i, i + 3).join(' ').trim();
+    if (chunk) paras.push(chunk);
+  }
+  return paras;
+}
+
 async function fetchFeed(feedDef) {
   try {
     const feed = await parser.parseURL(feedDef.url);
     return (feed.items || []).slice(0, 10).map(item => {
       const title = sentenceCase(stripHtml(item.title || ''));
       const desc = shortSummary(title, item.contentSnippet || item.content || item.summary || item.description || '');
-      const rawBody = sentenceCase(stripHtml(item.contentSnippet || item.content || item.summary || item.description || title));
-      const bodySentences = rawBody.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean).slice(0, 4);
+      const rawBody = sentenceCase(stripHtml(item.content || item.contentSnippet || item.summary || item.description || title));
+      const bodySentences = rawBody.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean).slice(0, 8);
+      const link = item.link || '';
+      const id = Buffer.from(link || title).toString('base64').replace(/=/g,'');
       return {
-        id: Buffer.from((item.link || title)).toString('base64').replace(/=/g,''),
+        id,
         title,
         desc,
         body: bodySentences.join('\n\n') || desc,
-        link: item.link || '',
+        link,
         pubDate: item.pubDate || item.isoDate || new Date().toUTCString(),
         tag: feedDef.tag,
         color: feedDef.color
@@ -133,6 +148,24 @@ async function buildNews(tab) {
   return unique.slice(0, 30);
 }
 
+async function extractLongArticle(url) {
+  try {
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EetaramBot/1.0)' }
+    });
+    if (!res.ok) return [];
+    const html = await res.text();
+    const dom = new JSDOM(html, { url });
+    const reader = new Readability(dom.window.document);
+    const article = reader.parse();
+    const text = sentenceCase(stripHtml(article?.textContent || ''));
+    if (!text || text.length < 400) return [];
+    return splitParagraphs(text).slice(0, 10);
+  } catch {
+    return [];
+  }
+}
+
 app.get('/health', (req, res) => {
   res.status(200).send('ok');
 });
@@ -140,15 +173,54 @@ app.get('/health', (req, res) => {
 app.get('/api/news', async (req, res) => {
   const tab = String(req.query.tab || 'all');
   const key = `news:${tab}`;
-  const entry = cache.get(key);
+  const entry = newsCache.get(key);
 
-  if (entry && Date.now() - entry.ts < TTL_MS) {
+  if (entry && Date.now() - entry.ts < NEWS_TTL_MS) {
     return res.json({ articles: entry.articles, cached: true });
   }
 
   const articles = await buildNews(tab);
-  cache.set(key, { ts: Date.now(), articles });
+  newsCache.set(key, { ts: Date.now(), articles });
   res.json({ articles, cached: false });
+});
+
+app.get('/api/article', async (req, res) => {
+  const id = String(req.query.id || '');
+  const link = String(req.query.link || '');
+  const fallbackBody = sentenceCase(String(req.query.body || ''));
+  const fallbackTitle = sentenceCase(String(req.query.title || ''));
+  const tag = String(req.query.tag || '');
+  const color = String(req.query.color || '#CC0000');
+  const pubDate = String(req.query.pubDate || new Date().toUTCString());
+
+  if (!id) {
+    return res.status(400).json({ error: 'Missing article id' });
+  }
+
+  const cached = articleCache.get(id);
+  if (cached && (Date.now() - cached.ts < ARTICLE_TTL_MS)) {
+    return res.json({ article: cached.article, cached: true });
+  }
+
+  let paragraphs = [];
+  if (link) {
+    paragraphs = await extractLongArticle(link);
+  }
+
+  if (!paragraphs.length) {
+    paragraphs = splitParagraphs(fallbackBody).slice(0, 6);
+  }
+
+  const article = {
+    title: fallbackTitle,
+    tag,
+    color,
+    pubDate,
+    paragraphs: paragraphs.length ? paragraphs : [fallbackBody || 'Full article is not available right now.']
+  };
+
+  articleCache.set(id, { ts: Date.now(), article });
+  res.json({ article, cached: false });
 });
 
 app.use(express.static(publicPath));

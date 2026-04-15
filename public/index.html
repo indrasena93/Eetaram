@@ -71,6 +71,7 @@
     .modal-meta{font-size:12px;color:#999;padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:22px}
     .article-wrap{font-size:16px;line-height:1.85;color:#1a1a1a}
     .article-wrap p{margin-bottom:16px}
+    .article-loading{display:flex;align-items:center;gap:12px;padding:10px 0 24px;color:var(--muted)}
     footer{background:var(--dark);color:rgba(255,255,255,.6);padding:24px 20px;margin-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;font-size:12px}
     footer .f-brand{color:#fff;font-size:20px;font-weight:700}
     footer .f-brand span{color:var(--gold)}
@@ -123,7 +124,7 @@
 </div>
 
 <main class="container">
-  <div class="status-bar">Fast mode enabled: cached RSS feeds only for reliable Render hosting.</div>
+  <div class="status-bar">Fast homepage + longer in-site full article on click.</div>
   <div class="cat-strip" id="cat-strip"></div>
   <div id="content"><div class="loader"><div class="spinner"></div>Loading news...</div></div>
 </main>
@@ -143,7 +144,7 @@
     <div class="f-brand">Ee<span>taram</span></div>
     <div style="margin-top:6px;">© 2026 Eetaram Media. All rights reserved.</div>
   </div>
-  <div>Fast production RSS version</div>
+  <div>Full-article modal upgrade</div>
 </footer>
 
 <script>
@@ -240,25 +241,59 @@ async function loadTab(tab){
       </div>`;
   }
 }
-function switchTab(tab, el){
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  loadTab(tab);
-}
-function openArticle(idx){
+async function openArticle(idx){
   const a = allArticles[idx];
   if(!a) return;
   document.getElementById('overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
-  const paragraphs = (a.body || '').split(/\n\n+/).filter(Boolean).map(p => `<p>${esc(p)}</p>`).join('');
   document.getElementById('modal-inner').innerHTML = `
     <div class="modal-body">
       <span class="modal-tag" style="${ts(a.color)}">${esc(a.tag)}</span>
       <div class="modal-title">${esc(a.title)}</div>
       <div class="modal-meta">${timeAgo(a.pubDate)}</div>
-      <div class="article-wrap">${paragraphs}</div>
+      <div class="article-loading"><div class="spinner" style="width:20px;height:20px;margin:0;border-width:2px"></div><span>Loading full article...</span></div>
     </div>
   `;
+
+  try{
+    const params = new URLSearchParams({
+      id: a.id || '',
+      link: a.link || '',
+      body: a.body || '',
+      title: a.title || '',
+      tag: a.tag || '',
+      color: a.color || '',
+      pubDate: a.pubDate || ''
+    });
+    const res = await fetch('/api/article?' + params.toString());
+    if(!res.ok) throw new Error('Article unavailable');
+    const data = await res.json();
+    const article = data.article || {};
+    const paragraphs = (article.paragraphs || []).map(p => `<p>${esc(p)}</p>`).join('');
+    document.getElementById('modal-inner').innerHTML = `
+      <div class="modal-body">
+        <span class="modal-tag" style="${ts(article.color || a.color)}">${esc(article.tag || a.tag)}</span>
+        <div class="modal-title">${esc(article.title || a.title)}</div>
+        <div class="modal-meta">${timeAgo(article.pubDate || a.pubDate)}</div>
+        <div class="article-wrap">${paragraphs}</div>
+      </div>
+    `;
+  }catch(err){
+    const paragraphs = (a.body || '').split(/\n\n+/).filter(Boolean).map(p => `<p>${esc(p)}</p>`).join('');
+    document.getElementById('modal-inner').innerHTML = `
+      <div class="modal-body">
+        <span class="modal-tag" style="${ts(a.color)}">${esc(a.tag)}</span>
+        <div class="modal-title">${esc(a.title)}</div>
+        <div class="modal-meta">${timeAgo(a.pubDate)}</div>
+        <div class="article-wrap">${paragraphs}</div>
+      </div>
+    `;
+  }
+}
+function switchTab(tab, el){
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  loadTab(tab);
 }
 function closeModal(){ document.getElementById('overlay').classList.remove('open'); document.body.style.overflow=''; }
 function bgClose(e){ if(e.target === document.getElementById('overlay')) closeModal(); }
