@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang=\"en\">
+<html lang="en">
 <head>
-  <meta charset=\"UTF-8\"/>
-  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Eetaram - News</title>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -12,14 +12,14 @@
       --white:#fff;--shad:0 1px 4px rgba(0,0,0,.07);
     }
     body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
-    .hdr-top{background:var(--dred);padding:5px 20px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:rgba(255,255,255,.8)}
+    .hdr-top{background:var(--dred);padding:5px 20px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:rgba(255,255,255,.85)}
     .hdr-main{background:var(--red);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
     .logo{font-size:32px;font-weight:700;color:#fff;letter-spacing:-1px}
     .logo span{color:var(--gold)}
-    .logo-sub{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px}
+    .logo-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px}
     .hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    .search-wrap input{padding:7px 16px;border-radius:20px;border:none;background:rgba(255,255,255,.2);color:#fff;font-size:13px;outline:none;width:200px;font-family:inherit}
-    .search-wrap input::placeholder{color:rgba(255,255,255,.55)}
+    .search-wrap input{padding:8px 16px;border-radius:20px;border:none;background:rgba(255,255,255,.18);color:#fff;font-size:13px;outline:none;width:220px;font-family:inherit}
+    .search-wrap input::placeholder{color:rgba(255,255,255,.65)}
     nav{background:var(--dark);display:flex;overflow-x:auto;padding:0 20px;scrollbar-width:none}
     nav::-webkit-scrollbar{display:none}
     nav button{background:none;border:none;border-bottom:3px solid transparent;color:#bbb;font-size:12.5px;font-weight:500;padding:10px 14px;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s;font-family:inherit}
@@ -31,6 +31,7 @@
     .ticker-inner span{font-size:12px;color:#222;font-weight:500;cursor:pointer}
     @keyframes scrollt{from{transform:translateX(100%)}to{transform:translateX(-300%)}}
     .container{max-width:1160px;margin:0 auto;padding:14px 20px}
+    .status-bar{background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:8px 14px;margin-bottom:12px;font-size:12px;color:#6d4c41}
     .cat-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
     .cat-chip{padding:5px 14px;border-radius:20px;font-size:11.5px;font-weight:500;cursor:pointer;border:1px solid #ccc;background:#fff;color:#555;transition:all .15s;font-family:inherit}
     .cat-chip.on{color:#fff;border-color:transparent;background:#CC0000}
@@ -42,21 +43,21 @@
     .error-box p{color:#c55;font-size:13px;margin-bottom:16px;line-height:1.6}
     .retry-btn{background:var(--red);color:#fff;border:none;padding:9px 24px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
     .hero-card{background:var(--white);border:1px solid var(--border);border-radius:10px;display:flex;overflow:hidden;margin-bottom:14px;box-shadow:var(--shad);cursor:pointer}
-    .hero-thumb{width:300px;min-height:200px;flex-shrink:0;background:#e8e8e8;display:flex;align-items:center;justify-content:center;font-size:60px}
+    .hero-thumb{width:300px;min-height:200px;flex-shrink:0;background:#e8e8e8;display:flex;align-items:center;justify-content:center;font-size:56px}
     .hero-body{padding:18px;flex:1;display:flex;flex-direction:column;gap:7px}
     .hero-tag{font-size:10px;font-weight:700;padding:2px 9px;border-radius:3px;width:fit-content;letter-spacing:.5px;text-transform:uppercase}
     .hero-title{font-size:19px;font-weight:700;line-height:1.4;color:var(--text)}
     .hero-desc{font-size:13px;color:var(--muted);line-height:1.65;flex:1}
-    .hero-time{font-size:11px;color:#bbb}
+    .hero-time{font-size:11px;color:#999}
     .read-btn{margin-top:6px;padding:7px 20px;background:var(--red);color:#fff;border-radius:20px;font-size:12px;font-weight:600;border:none;cursor:pointer;font-family:inherit;width:fit-content}
     .sec-title{font-size:15px;font-weight:700;border-left:4px solid var(--red);padding-left:9px;margin:16px 0 10px}
     .news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(275px,1fr));gap:12px;margin-bottom:18px}
     .news-card{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shad);display:flex;flex-direction:column;cursor:pointer}
-    .card-img{width:100%;height:158px;background:#ebebeb;display:flex;align-items:center;justify-content:center;font-size:44px}
+    .card-img{width:100%;height:158px;background:#ebebeb;display:flex;align-items:center;justify-content:center;font-size:42px}
     .card-body{padding:11px 12px 13px;flex:1;display:flex;flex-direction:column;gap:5px}
     .card-tag{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:3px;width:fit-content;letter-spacing:.4px;text-transform:uppercase}
     .card-title{font-size:13px;font-weight:600;line-height:1.5;flex:1;color:var(--text)}
-    .card-time{font-size:10.5px;color:#bbb;margin-top:5px}
+    .card-time{font-size:10.5px;color:#999;margin-top:5px}
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;overflow-y:auto;padding:20px 16px}
     .modal-overlay.open{display:flex;align-items:flex-start;justify-content:center}
     .modal{background:var(--white);border-radius:14px;width:100%;max-width:860px;margin:auto;overflow:hidden}
@@ -67,7 +68,7 @@
     .modal-body{padding:28px 36px 36px}
     .modal-tag{font-size:10px;font-weight:700;padding:3px 10px;border-radius:3px;text-transform:uppercase;letter-spacing:.5px;display:inline-block;margin-bottom:14px}
     .modal-title{font-size:26px;font-weight:700;line-height:1.35;color:var(--text);margin-bottom:10px}
-    .modal-meta{font-size:12px;color:#bbb;padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:22px}
+    .modal-meta{font-size:12px;color:#999;padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:22px}
     .article-wrap{font-size:16px;line-height:1.85;color:#1a1a1a}
     .article-wrap p{margin-bottom:16px}
     footer{background:var(--dark);color:rgba(255,255,255,.6);padding:24px 20px;margin-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;font-size:12px}
@@ -77,7 +78,7 @@
       .hero-card{flex-direction:column}
       .hero-thumb{width:100%;height:180px}
       .news-grid{grid-template-columns:1fr}
-      .search-wrap input{width:110px}
+      .search-wrap input{width:140px}
       .modal-body{padding:16px 14px 24px}
       .modal-title{font-size:20px}
     }
@@ -85,67 +86,69 @@
 </head>
 <body>
 <header>
-  <div class=\"hdr-top\">
-    <span id=\"clock\"></span>
+  <div class="hdr-top">
+    <span id="clock"></span>
     <span>Andhra Pradesh • Telangana • National • World</span>
   </div>
-  <div class=\"hdr-main\">
+  <div class="hdr-main">
     <div>
-      <div class=\"logo\">Ee<span>taram</span></div>
-      <div class=\"logo-sub\">Your trusted news source</div>
+      <div class="logo">Ee<span>taram</span></div>
+      <div class="logo-sub">Your trusted news source</div>
     </div>
-    <div class=\"hdr-right\">
-      <div class=\"search-wrap\">
-        <input type=\"text\" id=\"search\" placeholder=\"Search news...\" autocomplete=\"off\"/>
+    <div class="hdr-right">
+      <div class="search-wrap">
+        <input type="text" id="search" placeholder="Search news..." autocomplete="off"/>
       </div>
     </div>
   </div>
   <nav>
-    <button class=\"active\" onclick=\"switchTab('all',this)\">All News</button>
-    <button onclick=\"switchTab('telangana',this)\">Telangana</button>
-    <button onclick=\"switchTab('andhra',this)\">Andhra Pradesh</button>
-    <button onclick=\"switchTab('national',this)\">National</button>
-    <button onclick=\"switchTab('world',this)\">World</button>
-    <button onclick=\"switchTab('entertainment',this)\">Entertainment</button>
-    <button onclick=\"switchTab('sports',this)\">Sports</button>
-    <button onclick=\"switchTab('tech',this)\">Technology</button>
-    <button onclick=\"switchTab('business',this)\">Business</button>
-    <button onclick=\"switchTab('health',this)\">Health</button>
+    <button class="active" onclick="switchTab('all',this)">All News</button>
+    <button onclick="switchTab('telangana',this)">Telangana</button>
+    <button onclick="switchTab('andhra',this)">Andhra Pradesh</button>
+    <button onclick="switchTab('national',this)">National</button>
+    <button onclick="switchTab('world',this)">World</button>
+    <button onclick="switchTab('entertainment',this)">Entertainment</button>
+    <button onclick="switchTab('sports',this)">Sports</button>
+    <button onclick="switchTab('tech',this)">Technology</button>
+    <button onclick="switchTab('business',this)">Business</button>
+    <button onclick="switchTab('health',this)">Health</button>
   </nav>
 </header>
 
-<div class=\"ticker\">
-  <span class=\"ticker-lbl\">BREAKING</span>
-  <div class=\"ticker-track\">
-    <div class=\"ticker-inner\" id=\"ticker-inner\"><span>Loading headlines...</span></div>
+<div class="ticker">
+  <span class="ticker-lbl">BREAKING</span>
+  <div class="ticker-track">
+    <div class="ticker-inner" id="ticker-inner"><span>Loading headlines...</span></div>
   </div>
 </div>
 
-<main class=\"container\">
-  <div class=\"cat-strip\" id=\"cat-strip\"></div>
-  <div id=\"content\"><div class=\"loader\"><div class=\"spinner\"></div>Loading news...</div></div>
+<main class="container">
+  <div class="status-bar">Fast mode enabled: cached RSS feeds only for reliable Render hosting.</div>
+  <div class="cat-strip" id="cat-strip"></div>
+  <div id="content"><div class="loader"><div class="spinner"></div>Loading news...</div></div>
 </main>
 
-<div class=\"modal-overlay\" id=\"overlay\" onclick=\"bgClose(event)\">
-  <div class=\"modal\">
-    <div class=\"modal-topbar\">
-      <div class=\"modal-brand\">Ee<span>taram</span></div>
-      <button class=\"modal-close\" onclick=\"closeModal()\">×</button>
+<div class="modal-overlay" id="overlay" onclick="bgClose(event)">
+  <div class="modal">
+    <div class="modal-topbar">
+      <div class="modal-brand">Ee<span>taram</span></div>
+      <button class="modal-close" onclick="closeModal()">×</button>
     </div>
-    <div id=\"modal-inner\"></div>
+    <div id="modal-inner"></div>
   </div>
 </div>
 
 <footer>
   <div>
-    <div class=\"f-brand\">Ee<span>taram</span></div>
-    <div style=\"margin-top:6px;\">© 2026 Eetaram Media. All rights reserved.</div>
+    <div class="f-brand">Ee<span>taram</span></div>
+    <div style="margin-top:6px;">© 2026 Eetaram Media. All rights reserved.</div>
   </div>
-  <div>Render-ready deployable version</div>
+  <div>Fast production RSS version</div>
 </footer>
 
 <script>
 let allArticles = [];
+let currentTab = 'all';
 
 function updateClock(){
   const n = new Date();
@@ -163,7 +166,7 @@ function timeAgo(ds){
   if(m<1440) return Math.floor(m/60) + ' hr ago';
   return Math.floor(m/1440) + ' d ago';
 }
-function esc(s=''){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s=''){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function ts(c){ return `background:${c}18;color:${c};`; }
 
 function heroHTML(a, idx){
@@ -197,7 +200,7 @@ function buildChips(articles){
 function renderArticles(articles){
   const el = document.getElementById('content');
   if(!articles.length){
-    el.innerHTML = '<div class="loader">No articles found.</div>';
+    el.innerHTML = '<div class="loader">No articles found right now.</div>';
     document.getElementById('ticker-inner').innerHTML = '<span>No headlines available</span>';
     return;
   }
@@ -220,6 +223,7 @@ function filterCat(tag, btn){
   renderArticles(filtered);
 }
 async function loadTab(tab){
+  currentTab = tab;
   document.getElementById('content').innerHTML = '<div class="loader"><div class="spinner"></div>Loading news...</div>';
   try{
     const res = await fetch('/api/news?tab=' + encodeURIComponent(tab));

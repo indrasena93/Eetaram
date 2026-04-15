@@ -1,173 +1,136 @@
 const express = require('express');
 const path = require('path');
 const Parser = require('rss-parser');
-const { JSDOM } = require('jsdom');
-const { Readability } = require('@mozilla/readability');
 
 const app = express();
-const parser = new Parser();
+const parser = new Parser({
+  timeout: 15000,
+  headers: {
+    'User-Agent': 'Mozilla/5.0 (compatible; EetaramBot/1.0)'
+  }
+});
+
 const PORT = process.env.PORT || 3000;
+const publicPath = path.join(__dirname, '..', 'public');
 
 const FEEDS = {
   all: [
-    'https://feeds.feedburner.com/ndtvnews-top-stories',
-    'https://timesofindia.indiatimes.com/rssfeedstopstories.cms',
-    'https://feeds.bbci.co.uk/news/world/rss.xml',
-    'https://feeds.feedburner.com/ndtvnews-india-news',
-    'https://www.thehindu.com/news/national/feeder/default.rss',
-    'https://indianexpress.com/feed/'
+    { url:'https://feeds.feedburner.com/ndtvnews-top-stories', tag:'National', color:'#CC0000' },
+    { url:'https://timesofindia.indiatimes.com/rssfeedstopstories.cms', tag:'National', color:'#CC0000' },
+    { url:'https://feeds.bbci.co.uk/news/world/rss.xml', tag:'World', color:'#006633' },
+    { url:'https://www.thehindu.com/news/national/feeder/default.rss', tag:'National', color:'#FF6600' },
+    { url:'https://indianexpress.com/feed/', tag:'National', color:'#1a237e' }
   ],
   telangana: [
-    'https://www.thehindu.com/news/national/telangana/feeder/default.rss',
-    'https://timesofindia.indiatimes.com/rssfeeds/-2128816011.cms'
+    { url:'https://www.thehindu.com/news/national/telangana/feeder/default.rss', tag:'Telangana', color:'#0044AA' }
   ],
   andhra: [
-    'https://www.thehindu.com/news/national/andhra-pradesh/feeder/default.rss',
-    'https://timesofindia.indiatimes.com/rssfeeds/7098551.cms'
+    { url:'https://www.thehindu.com/news/national/andhra-pradesh/feeder/default.rss', tag:'Andhra Pradesh', color:'#CC0000' }
   ],
   national: [
-    'https://feeds.feedburner.com/ndtvnews-india-news',
-    'https://www.thehindu.com/news/national/feeder/default.rss',
-    'https://indianexpress.com/section/india/feed/'
+    { url:'https://feeds.feedburner.com/ndtvnews-india-news', tag:'National', color:'#FF6600' },
+    { url:'https://www.thehindu.com/news/national/feeder/default.rss', tag:'National', color:'#8B0000' },
+    { url:'https://indianexpress.com/section/india/feed/', tag:'National', color:'#1a237e' }
   ],
   world: [
-    'https://feeds.bbci.co.uk/news/world/rss.xml',
-    'https://feeds.bbci.co.uk/news/world/asia/rss.xml',
-    'https://rss.nytimes.com/services/xml/rss/nyt/World.xml'
+    { url:'https://feeds.bbci.co.uk/news/world/rss.xml', tag:'World', color:'#006633' },
+    { url:'https://feeds.bbci.co.uk/news/world/asia/rss.xml', tag:'Asia', color:'#2E7D32' },
+    { url:'https://rss.nytimes.com/services/xml/rss/nyt/World.xml', tag:'World', color:'#222222' }
   ],
   entertainment: [
-    'https://feeds.feedburner.com/ndtvnews-entertainment',
-    'https://indianexpress.com/section/entertainment/feed/'
+    { url:'https://feeds.feedburner.com/ndtvnews-entertainment', tag:'Entertainment', color:'#AA0066' },
+    { url:'https://indianexpress.com/section/entertainment/feed/', tag:'Entertainment', color:'#880099' }
   ],
   sports: [
-    'https://feeds.feedburner.com/ndtvnews-sports',
-    'https://feeds.bbci.co.uk/sport/rss.xml'
+    { url:'https://feeds.feedburner.com/ndtvnews-sports', tag:'Sports', color:'#1565C0' },
+    { url:'https://feeds.bbci.co.uk/sport/rss.xml', tag:'Sports', color:'#0D47A1' }
   ],
   tech: [
-    'https://feeds.feedburner.com/TechCrunch',
-    'https://feeds.bbci.co.uk/news/technology/rss.xml'
+    { url:'https://feeds.feedburner.com/TechCrunch', tag:'Technology', color:'#0F9D58' },
+    { url:'https://feeds.bbci.co.uk/news/technology/rss.xml', tag:'Technology', color:'#0F9D58' }
   ],
   business: [
-    'https://feeds.feedburner.com/ndtvnews-business',
-    'https://feeds.bbci.co.uk/news/business/rss.xml'
+    { url:'https://feeds.feedburner.com/ndtvnews-business', tag:'Business', color:'#004D40' },
+    { url:'https://feeds.bbci.co.uk/news/business/rss.xml', tag:'Business', color:'#004D40' }
   ],
   health: [
-    'https://feeds.bbci.co.uk/news/health/rss.xml'
+    { url:'https://feeds.bbci.co.uk/news/health/rss.xml', tag:'Health', color:'#2E7D32' }
   ]
 };
 
-const TAG_META = {
-  all: { tag: 'Top News', color: '#CC0000' },
-  telangana: { tag: 'Telangana', color: '#0044AA' },
-  andhra: { tag: 'Andhra Pradesh', color: '#CC0000' },
-  national: { tag: 'National', color: '#FF6600' },
-  world: { tag: 'World', color: '#006633' },
-  entertainment: { tag: 'Entertainment', color: '#880099' },
-  sports: { tag: 'Sports', color: '#1565C0' },
-  tech: { tag: 'Technology', color: '#0F9D58' },
-  business: { tag: 'Business', color: '#004D40' },
-  health: { tag: 'Health', color: '#2E7D32' }
-};
+const cache = new Map();
+const TTL_MS = 5 * 60 * 1000;
 
-const feedCache = new Map();
-const FEED_TTL_MS = 5 * 60 * 1000;
-
-async function extractArticle(url) {
-  try {
-    const res = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0' }
-    });
-    if (!res.ok) return '';
-    const html = await res.text();
-    const dom = new JSDOM(html, { url });
-    const reader = new Readability(dom.window.document);
-    const article = reader.parse();
-    return article?.textContent || '';
-  } catch {
-    return '';
-  }
-}
-
-function cleanText(text) {
-  if (!text) return '';
-  return text
-    .replace(/\r/g, ' ')
-    .replace(/\n+/g, ' ')
+function stripHtml(input = '') {
+  return String(input)
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ')
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/\b\d+\s+(minutes?|mins?|hours?|hrs?|days?)\s+ago\b/gi, ' ')
-    .replace(/\b(Reuters|BBC|CNN|NDTV|The Hindu|Associated Press|AP News|CBS News|Fox News|Getty Images|Times of India|Indian Express)\b/gi, ' ')
-    .replace(/\b(correspondent|editor|reporter|digital editor|Gaza correspondent)\b/gi, ' ')
-    .replace(/\s{2,}/g, ' ')
     .trim();
 }
 
-function splitSentences(text) {
-  return cleanText(text)
-    .split(/(?<=[.!?])\s+/)
-    .map(s => s.trim())
-    .filter(Boolean);
+function sentenceCase(s='') {
+  return s.replace(/\s+/g, ' ').trim();
 }
 
-function isBadSentence(s) {
-  if (!s) return true;
-  if (s.length < 60 || s.length > 280) return true;
-  const bad = [
-    /\b(read more|click here|newsletter|sign up|watch live|photo|image credit|copyright)\b/i,
-    /\b(correspondent|editor|reporter)\b/i
-  ];
-  return bad.some(rx => rx.test(s));
+function shortSummary(title = '', desc = '') {
+  const cleaned = sentenceCase(stripHtml(desc));
+  if (!cleaned) return title;
+  const sentences = cleaned.split(/(?<=[.!?])\s+/).map(x => x.trim()).filter(Boolean);
+  const best = (sentences[0] || cleaned).slice(0, 220).trim();
+  return best.length < cleaned.length ? best + (/[.!?]$/.test(best) ? '' : '...') : best;
 }
 
-function rewriteArticle(text, fallbackTitle = '') {
-  const good = splitSentences(text).filter(s => !isBadSentence(s)).slice(0, 5);
-  if (good.length < 2) return null;
-
-  const title = fallbackTitle && fallbackTitle.trim().length > 20
-    ? fallbackTitle.trim()
-    : good[0].split(' ').slice(0, 11).join(' ') + '...';
-
-  return {
-    title,
-    summary: good[0],
-    body: good.slice(0, 3).join('\n\n')
-  };
+function normalizeTitle(title='') {
+  return title.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
 }
 
-function normalizeTitle(t = '') {
-  return t.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim().slice(0, 90);
+function timeValue(pubDate) {
+  const d = new Date(pubDate || 0);
+  return isNaN(d) ? 0 : d.getTime();
 }
 
-async function feedItems(url, tab) {
+async function fetchFeed(feedDef) {
   try {
-    const feed = await parser.parseURL(url);
-    const meta = TAG_META[tab] || TAG_META.all;
-    const items = [];
-
-    for (const item of (feed.items || []).slice(0, 5)) {
-      const title = (item.title || '').trim();
-      const link = item.link || '';
-      if (!title || !link) continue;
-
-      const raw = await extractArticle(link);
-      const rewritten = rewriteArticle(raw, title);
-      if (!rewritten) continue;
-
-      items.push({
-        title: rewritten.title,
-        desc: rewritten.summary,
-        body: rewritten.body,
-        pubDate: item.pubDate || new Date().toUTCString(),
-        tag: meta.tag,
-        color: meta.color,
-        imgUrl: '',
-        link
-      });
-    }
-    return items;
+    const feed = await parser.parseURL(feedDef.url);
+    return (feed.items || []).slice(0, 10).map(item => {
+      const title = sentenceCase(stripHtml(item.title || ''));
+      const desc = shortSummary(title, item.contentSnippet || item.content || item.summary || item.description || '');
+      const rawBody = sentenceCase(stripHtml(item.contentSnippet || item.content || item.summary || item.description || title));
+      const bodySentences = rawBody.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean).slice(0, 4);
+      return {
+        id: Buffer.from((item.link || title)).toString('base64').replace(/=/g,''),
+        title,
+        desc,
+        body: bodySentences.join('\n\n') || desc,
+        link: item.link || '',
+        pubDate: item.pubDate || item.isoDate || new Date().toUTCString(),
+        tag: feedDef.tag,
+        color: feedDef.color
+      };
+    }).filter(x => x.title);
   } catch {
     return [];
   }
+}
+
+async function buildNews(tab) {
+  const feeds = FEEDS[tab] || FEEDS.all;
+  const results = await Promise.all(feeds.map(fetchFeed));
+  const merged = results.flat();
+  const seen = new Set();
+  const unique = [];
+  for (const item of merged) {
+    const key = normalizeTitle(item.title).slice(0, 120);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    unique.push(item);
+  }
+  unique.sort((a, b) => timeValue(b.pubDate) - timeValue(a.pubDate));
+  return unique.slice(0, 30);
 }
 
 app.get('/health', (req, res) => {
@@ -175,34 +138,23 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/api/news', async (req, res) => {
-  const tab = req.query.tab || 'all';
-  const cacheKey = `news:${tab}`;
-  const cached = feedCache.get(cacheKey);
+  const tab = String(req.query.tab || 'all');
+  const key = `news:${tab}`;
+  const entry = cache.get(key);
 
-  if (cached && (Date.now() - cached.ts) < FEED_TTL_MS) {
-    return res.json({ articles: cached.articles, cached: true });
+  if (entry && Date.now() - entry.ts < TTL_MS) {
+    return res.json({ articles: entry.articles, cached: true });
   }
 
-  const feeds = FEEDS[tab] || FEEDS.all;
-  const results = await Promise.all(feeds.map(f => feedItems(f, tab)));
-  let articles = results.flat();
-
-  const seen = new Set();
-  articles = articles.filter(a => {
-    const key = normalizeTitle(a.title);
-    if (!key || seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-
-  feedCache.set(cacheKey, { ts: Date.now(), articles });
+  const articles = await buildNews(tab);
+  cache.set(key, { ts: Date.now(), articles });
   res.json({ articles, cached: false });
 });
 
-app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use(express.static(publicPath));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+  res.sendFile(path.join(publicPath, 'index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
