@@ -1,11 +1,14 @@
 {
-  "name": "eetaram",
+  "name": "eetaram-final-deployable",
   "version": "1.0.0",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "@mozilla/readability": "^0.5.0",
+    "express": "^4.18.2",
+    "jsdom": "^22.1.0",
+    "rss-parser": "^3.12.0"
   }
 }
