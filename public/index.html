@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang=\"en\">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset=\"UTF-8\"/>
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>
   <title>Eetaram - News</title>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -12,8 +12,6 @@
       --white:#fff;--shad:0 1px 4px rgba(0,0,0,.07);
     }
     body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
-
-    /* HEADER */
     .hdr-top{background:var(--dred);padding:5px 20px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:rgba(255,255,255,.8)}
     .hdr-main{background:var(--red);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
     .logo{font-size:32px;font-weight:700;color:#fff;letter-spacing:-1px}
@@ -22,81 +20,43 @@
     .hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
     .search-wrap input{padding:7px 16px;border-radius:20px;border:none;background:rgba(255,255,255,.2);color:#fff;font-size:13px;outline:none;width:200px;font-family:inherit}
     .search-wrap input::placeholder{color:rgba(255,255,255,.55)}
-
-    /* NAV */
     nav{background:var(--dark);display:flex;overflow-x:auto;padding:0 20px;scrollbar-width:none}
     nav::-webkit-scrollbar{display:none}
     nav button{background:none;border:none;border-bottom:3px solid transparent;color:#bbb;font-size:12.5px;font-weight:500;padding:10px 14px;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s;font-family:inherit}
     nav button:hover,nav button.active{color:var(--gold);border-bottom-color:var(--gold)}
-
-    /* TICKER */
     .ticker{background:var(--gold);padding:5px 0;display:flex;align-items:center;overflow:hidden}
     .ticker-lbl{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:3px 12px;white-space:nowrap;margin-left:20px;margin-right:12px;flex-shrink:0;border-radius:2px}
     .ticker-track{flex:1;overflow:hidden}
     .ticker-inner{display:flex;gap:60px;white-space:nowrap;animation:scrollt 70s linear infinite}
-    @keyframes scrollt{from{transform:translateX(100%)}to{transform:translateX(-300%)}}
     .ticker-inner span{font-size:12px;color:#222;font-weight:500;cursor:pointer}
-
-    /* MAIN */
+    @keyframes scrollt{from{transform:translateX(100%)}to{transform:translateX(-300%)}}
     .container{max-width:1160px;margin:0 auto;padding:14px 20px}
     .cat-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
     .cat-chip{padding:5px 14px;border-radius:20px;font-size:11.5px;font-weight:500;cursor:pointer;border:1px solid #ccc;background:#fff;color:#555;transition:all .15s;font-family:inherit}
     .cat-chip.on{color:#fff;border-color:transparent;background:#CC0000}
-
-    /* LOADER */
     .loader{text-align:center;padding:60px 20px;color:var(--muted);font-size:13px}
     .spinner{width:36px;height:36px;border:3px solid #e8e8e8;border-top-color:var(--red);border-radius:50%;animation:spin .75s linear infinite;margin:0 auto 14px}
     @keyframes spin{to{transform:rotate(360deg)}}
-
-    /* THUMBNAILS */
-    .hero-thumb{
-      width:300px;min-height:200px;flex-shrink:0;
-      background:#e8e8e8;overflow:hidden;
-      display:flex;align-items:center;justify-content:center;
-    }
-    .hero-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-
-    .card-img{
-      width:100%;height:200px;flex-shrink:0;
-      background:#e8e8e8;overflow:hidden;
-      display:flex;align-items:center;justify-content:center;
-    }
-    .card-img img{width:100%;height:100%;object-fit:cover;display:block}
-
-    /* Placeholder shown when no image URL or image fails to load */
-    .thumb-ph{
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      width:100%;height:100%;gap:6px;color:#bbb;font-size:12px;
-    }
-    .thumb-ph svg{display:block}
-
-    /* HERO CARD */
-    .hero-card{background:var(--white);border:1px solid var(--border);border-radius:10px;display:flex;overflow:hidden;margin-bottom:14px;box-shadow:var(--shad);cursor:pointer;transition:box-shadow .2s}
-    .hero-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.13)}
-    .hero-body{padding:18px;flex:1;display:flex;flex-direction:column;gap:7px;min-width:0}
+    .error-box{background:#fff0f0;border:1px solid #ffbbbb;border-radius:10px;padding:24px;margin:20px 0;text-align:center}
+    .error-box h3{color:#a00;margin-bottom:8px}
+    .error-box p{color:#c55;font-size:13px;margin-bottom:16px;line-height:1.6}
+    .retry-btn{background:var(--red);color:#fff;border:none;padding:9px 24px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+    .hero-card{background:var(--white);border:1px solid var(--border);border-radius:10px;display:flex;overflow:hidden;margin-bottom:14px;box-shadow:var(--shad);cursor:pointer}
+    .hero-thumb{width:300px;min-height:200px;flex-shrink:0;background:#e8e8e8;display:flex;align-items:center;justify-content:center;font-size:60px}
+    .hero-body{padding:18px;flex:1;display:flex;flex-direction:column;gap:7px}
     .hero-tag{font-size:10px;font-weight:700;padding:2px 9px;border-radius:3px;width:fit-content;letter-spacing:.5px;text-transform:uppercase}
     .hero-title{font-size:19px;font-weight:700;line-height:1.4;color:var(--text)}
     .hero-desc{font-size:13px;color:var(--muted);line-height:1.65;flex:1}
     .hero-time{font-size:11px;color:#bbb}
     .read-btn{margin-top:6px;padding:7px 20px;background:var(--red);color:#fff;border-radius:20px;font-size:12px;font-weight:600;border:none;cursor:pointer;font-family:inherit;width:fit-content}
-
-    /* GRID */
     .sec-title{font-size:15px;font-weight:700;border-left:4px solid var(--red);padding-left:9px;margin:16px 0 10px}
     .news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(275px,1fr));gap:12px;margin-bottom:18px}
-    .news-card{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shad);display:flex;flex-direction:column;cursor:pointer;transition:box-shadow .2s,transform .15s}
-    .news-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.12);transform:translateY(-2px)}
+    .news-card{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shad);display:flex;flex-direction:column;cursor:pointer}
+    .card-img{width:100%;height:158px;background:#ebebeb;display:flex;align-items:center;justify-content:center;font-size:44px}
     .card-body{padding:11px 12px 13px;flex:1;display:flex;flex-direction:column;gap:5px}
     .card-tag{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:3px;width:fit-content;letter-spacing:.4px;text-transform:uppercase}
     .card-title{font-size:13px;font-weight:600;line-height:1.5;flex:1;color:var(--text)}
     .card-time{font-size:10.5px;color:#bbb;margin-top:5px}
-
-    /* ERROR */
-    .error-box{background:#fff0f0;border:1px solid #ffbbbb;border-radius:10px;padding:24px;text-align:center;margin:20px 0}
-    .error-box h3{color:#a00;margin-bottom:8px}
-    .error-box p{color:#c55;font-size:13px;margin-bottom:14px}
-    .retry-btn{background:var(--red);color:#fff;border:none;padding:8px 22px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
-
-    /* MODAL */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;overflow-y:auto;padding:20px 16px}
     .modal-overlay.open{display:flex;align-items:flex-start;justify-content:center}
     .modal{background:var(--white);border-radius:14px;width:100%;max-width:860px;margin:auto;overflow:hidden}
@@ -104,23 +64,18 @@
     .modal-brand{font-size:18px;font-weight:700;color:#fff}
     .modal-brand span{color:var(--gold)}
     .modal-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
-    .modal-close:hover{background:rgba(255,255,255,.35)}
-    .modal-hero-img{width:100%;max-height:380px;object-fit:cover;display:block}
     .modal-body{padding:28px 36px 36px}
     .modal-tag{font-size:10px;font-weight:700;padding:3px 10px;border-radius:3px;text-transform:uppercase;letter-spacing:.5px;display:inline-block;margin-bottom:14px}
     .modal-title{font-size:26px;font-weight:700;line-height:1.35;color:var(--text);margin-bottom:10px}
     .modal-meta{font-size:12px;color:#bbb;padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:22px}
     .article-wrap{font-size:16px;line-height:1.85;color:#1a1a1a}
     .article-wrap p{margin-bottom:16px}
-
-    /* FOOTER */
     footer{background:var(--dark);color:rgba(255,255,255,.6);padding:24px 20px;margin-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;font-size:12px}
     footer .f-brand{color:#fff;font-size:20px;font-weight:700}
     footer .f-brand span{color:var(--gold)}
-
     @media(max-width:640px){
       .hero-card{flex-direction:column}
-      .hero-thumb{width:100%;height:220px;min-height:unset}
+      .hero-thumb{width:100%;height:180px}
       .news-grid{grid-template-columns:1fr}
       .search-wrap input{width:110px}
       .modal-body{padding:16px 14px 24px}
@@ -129,263 +84,187 @@
   </style>
 </head>
 <body>
-
 <header>
-  <div class="hdr-top">
-    <span id="clock"></span>
+  <div class=\"hdr-top\">
+    <span id=\"clock\"></span>
     <span>Andhra Pradesh • Telangana • National • World</span>
   </div>
-  <div class="hdr-main">
+  <div class=\"hdr-main\">
     <div>
-      <div class="logo">Ee<span>taram</span></div>
-      <div class="logo-sub">Your trusted news source</div>
+      <div class=\"logo\">Ee<span>taram</span></div>
+      <div class=\"logo-sub\">Your trusted news source</div>
     </div>
-    <div class="hdr-right">
-      <div class="search-wrap">
-        <input type="text" id="search" placeholder="Search news..." autocomplete="off"/>
+    <div class=\"hdr-right\">
+      <div class=\"search-wrap\">
+        <input type=\"text\" id=\"search\" placeholder=\"Search news...\" autocomplete=\"off\"/>
       </div>
     </div>
   </div>
   <nav>
-    <button class="active" onclick="switchTab('all',this)">All News</button>
-    <button onclick="switchTab('telangana',this)">Telangana</button>
-    <button onclick="switchTab('andhra',this)">Andhra Pradesh</button>
-    <button onclick="switchTab('national',this)">National</button>
-    <button onclick="switchTab('world',this)">World</button>
-    <button onclick="switchTab('entertainment',this)">Entertainment</button>
-    <button onclick="switchTab('sports',this)">Sports</button>
-    <button onclick="switchTab('tech',this)">Technology</button>
-    <button onclick="switchTab('business',this)">Business</button>
-    <button onclick="switchTab('health',this)">Health</button>
+    <button class=\"active\" onclick=\"switchTab('all',this)\">All News</button>
+    <button onclick=\"switchTab('telangana',this)\">Telangana</button>
+    <button onclick=\"switchTab('andhra',this)\">Andhra Pradesh</button>
+    <button onclick=\"switchTab('national',this)\">National</button>
+    <button onclick=\"switchTab('world',this)\">World</button>
+    <button onclick=\"switchTab('entertainment',this)\">Entertainment</button>
+    <button onclick=\"switchTab('sports',this)\">Sports</button>
+    <button onclick=\"switchTab('tech',this)\">Technology</button>
+    <button onclick=\"switchTab('business',this)\">Business</button>
+    <button onclick=\"switchTab('health',this)\">Health</button>
   </nav>
 </header>
 
-<div class="ticker">
-  <span class="ticker-lbl">BREAKING</span>
-  <div class="ticker-track">
-    <div class="ticker-inner" id="ticker-inner"><span>Loading headlines...</span></div>
+<div class=\"ticker\">
+  <span class=\"ticker-lbl\">BREAKING</span>
+  <div class=\"ticker-track\">
+    <div class=\"ticker-inner\" id=\"ticker-inner\"><span>Loading headlines...</span></div>
   </div>
 </div>
 
-<main class="container">
-  <div class="cat-strip" id="cat-strip"></div>
-  <div id="content"><div class="loader"><div class="spinner"></div>Loading news...</div></div>
+<main class=\"container\">
+  <div class=\"cat-strip\" id=\"cat-strip\"></div>
+  <div id=\"content\"><div class=\"loader\"><div class=\"spinner\"></div>Loading news...</div></div>
 </main>
 
-<div class="modal-overlay" id="overlay" onclick="bgClose(event)">
-  <div class="modal">
-    <div class="modal-topbar">
-      <div class="modal-brand">Ee<span>taram</span></div>
-      <button class="modal-close" onclick="closeModal()">&#10005;</button>
+<div class=\"modal-overlay\" id=\"overlay\" onclick=\"bgClose(event)\">
+  <div class=\"modal\">
+    <div class=\"modal-topbar\">
+      <div class=\"modal-brand\">Ee<span>taram</span></div>
+      <button class=\"modal-close\" onclick=\"closeModal()\">×</button>
     </div>
-    <div id="modal-inner"></div>
+    <div id=\"modal-inner\"></div>
   </div>
 </div>
 
 <footer>
   <div>
-    <div class="f-brand">Ee<span>taram</span></div>
-    <div style="margin-top:6px;">© 2026 Eetaram Media. All rights reserved.</div>
+    <div class=\"f-brand\">Ee<span>taram</span></div>
+    <div style=\"margin-top:6px;\">© 2026 Eetaram Media. All rights reserved.</div>
   </div>
-  <div>Andhra Pradesh • Telangana • National • World</div>
+  <div>Render-ready deployable version</div>
 </footer>
 
 <script>
-/* ─── STATE ─── */
-let allArticles = [], currentTab = 'all', autoTimer;
+let allArticles = [];
 
-/* ─── CLOCK ─── */
-function updateClock() {
+function updateClock(){
   const n = new Date();
   document.getElementById('clock').textContent =
-    n.toLocaleDateString('en-IN', {weekday:'short',day:'numeric',month:'short',year:'numeric'}) +
-    ' • ' + n.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'});
+    n.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'}) +
+    ' • ' + n.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
 }
-
-function timeAgo(ds) {
-  if (!ds) return '';
-  const d = new Date(ds); if (isNaN(d)) return '';
-  const m = Math.floor((Date.now() - d) / 60000);
-  if (m < 1)    return 'Just now';
-  if (m < 60)   return m + ' min ago';
-  if (m < 1440) return Math.floor(m / 60) + ' hr ago';
-  return Math.floor(m / 1440) + ' d ago';
+function timeAgo(ds){
+  if(!ds) return '';
+  const d = new Date(ds);
+  if (isNaN(d)) return '';
+  const m = Math.floor((Date.now()-d)/60000);
+  if(m<1) return 'Just now';
+  if(m<60) return m + ' min ago';
+  if(m<1440) return Math.floor(m/60) + ' hr ago';
+  return Math.floor(m/1440) + ' d ago';
 }
+function esc(s=''){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function ts(c){ return `background:${c}18;color:${c};`; }
 
-function esc(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function heroHTML(a, idx){
+  return `<div class="hero-card" onclick="openArticle(${idx})">
+    <div class="hero-thumb">📰</div>
+    <div class="hero-body">
+      <span class="hero-tag" style="${ts(a.color)}">${esc(a.tag)}</span>
+      <div class="hero-title">${esc(a.title)}</div>
+      <div class="hero-desc">${esc(a.desc)}</div>
+      <div class="hero-time">${timeAgo(a.pubDate)}</div>
+      <button class="read-btn" onclick="event.stopPropagation();openArticle(${idx})">Read Full Article</button>
+    </div>
+  </div>`;
 }
-function ts(c) { return 'background:' + c + '18;color:' + c + ';'; }
-
-/* ─── PLACEHOLDER ───────────────────────────────────────────────────
-   Called from onerror — NEVER embed complex HTML in onerror="..."
-   because SVG attribute quotes break the HTML attribute parser,
-   producing the '">' artifact seen in the previous version.
-   Instead call a named function and let JS build the DOM safely.
-─────────────────────────────────────────────────────────────────── */
-function imgError(img) {
-  const wrap = img.parentNode;
-  wrap.innerHTML = '';                   // remove the broken <img>
-  const ph = document.createElement('div');
-  ph.className = 'thumb-ph';
-  ph.innerHTML =
-    '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" ' +
-    'stroke="#ccc" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
-    '<rect x="2" y="3" width="20" height="18" rx="2"></rect>' +
-    '<line x1="2" y1="8" x2="22" y2="8"></line>' +
-    '<line x1="6" y1="13" x2="10" y2="13"></line>' +
-    '<line x1="6" y1="16" x2="18" y2="16"></line>' +
-    '<line x1="6" y1="19" x2="14" y2="19"></line>' +
-    '<rect x="12" y="11" width="6" height="4" rx="0.5"></rect>' +
-    '</svg>';
-  wrap.appendChild(ph);
+function cardHTML(a, idx){
+  return `<div class="news-card" onclick="openArticle(${idx})">
+    <div class="card-img">📰</div>
+    <div class="card-body">
+      <span class="card-tag" style="${ts(a.color)}">${esc(a.tag)}</span>
+      <div class="card-title">${esc(a.title)}</div>
+      <div class="card-time">${timeAgo(a.pubDate)}</div>
+    </div>
+  </div>`;
 }
-
-/* Build a thumbnail container.
-   wrapClass = 'hero-thumb' | 'card-img'
-   Uses onerror="imgError(this)" — safe, no embedded HTML. */
-function makeThumb(imgUrl, wrapClass, alt) {
-  if (imgUrl) {
-    return '<div class="' + wrapClass + '">' +
-           '<img src="' + esc(imgUrl) + '" alt="' + esc(alt) + '" loading="lazy" onerror="imgError(this)">' +
-           '</div>';
-  }
-  // No URL at all — render placeholder directly
-  return '<div class="' + wrapClass + '">' +
-         '<div class="thumb-ph">' +
-         '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" ' +
-         'stroke="#ccc" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
-         '<rect x="2" y="3" width="20" height="18" rx="2"></rect>' +
-         '<line x1="2" y1="8" x2="22" y2="8"></line>' +
-         '<line x1="6" y1="13" x2="10" y2="13"></line>' +
-         '<line x1="6" y1="16" x2="18" y2="16"></line>' +
-         '<line x1="6" y1="19" x2="14" y2="19"></line>' +
-         '<rect x="12" y="11" width="6" height="4" rx="0.5"></rect>' +
-         '</svg></div></div>';
-}
-
-/* ─── CARD HTML ─── */
-function heroHTML(a, idx) {
-  return '<div class="hero-card" onclick="openArticle(' + idx + ')">' +
-    makeThumb(a.imgUrl, 'hero-thumb', a.title) +
-    '<div class="hero-body">' +
-      '<span class="hero-tag" style="' + ts(a.color) + '">' + esc(a.tag) + '</span>' +
-      '<div class="hero-title">' + esc(a.title) + '</div>' +
-      '<div class="hero-desc">'  + esc(a.desc)  + '</div>' +
-      '<div class="hero-time">'  + timeAgo(a.pubDate) + '</div>' +
-      '<button class="read-btn" onclick="event.stopPropagation();openArticle(' + idx + ')">Read Full Article</button>' +
-    '</div>' +
-  '</div>';
-}
-
-function cardHTML(a, idx) {
-  return '<div class="news-card" onclick="openArticle(' + idx + ')">' +
-    makeThumb(a.imgUrl, 'card-img', a.title) +
-    '<div class="card-body">' +
-      '<span class="card-tag" style="' + ts(a.color) + '">' + esc(a.tag) + '</span>' +
-      '<div class="card-title">' + esc(a.title) + '</div>' +
-      '<div class="card-time">'  + timeAgo(a.pubDate) + '</div>' +
-    '</div>' +
-  '</div>';
-}
-
-/* ─── RENDER ─── */
-function renderArticles(articles) {
-  const el = document.getElementById('content');
-  if (!articles.length) { el.innerHTML = '<div class="loader">No articles found.</div>'; return; }
-  const sorted = [...articles].sort((a,b) => new Date(b.pubDate||0) - new Date(a.pubDate||0));
-  let html = '<div class="sec-title">Top Stories</div>';
-  sorted.slice(0, 2).forEach(a => { html += heroHTML(a, allArticles.indexOf(a)); });
-  if (sorted.length > 2) {
-    html += '<div class="sec-title">Latest News</div><div class="news-grid">';
-    sorted.slice(2).forEach(a => { html += cardHTML(a, allArticles.indexOf(a)); });
-    html += '</div>';
-  }
-  el.innerHTML = html;
-  document.getElementById('ticker-inner').innerHTML =
-    sorted.slice(0, 12).map(a => '<span onclick="openArticle(' + allArticles.indexOf(a) + ')">' + esc(a.title) + '</span>').join('');
-  buildChips(articles);
-}
-
-function buildChips(articles) {
+function buildChips(articles){
   const tags = [...new Set(articles.map(a => a.tag))];
   document.getElementById('cat-strip').innerHTML =
-    '<button class="cat-chip on" onclick="filterCat(\'\',this)">All</button>' +
-    tags.map(t => '<button class="cat-chip" onclick="filterCat(\'' + t.replace(/'/g, "\\'") + '\',this)">' + esc(t) + '</button>').join('');
+    `<button class="cat-chip on" onclick="filterCat('', this)">All</button>` +
+    tags.map(t => `<button class="cat-chip" onclick="filterCat('${t.replace(/'/g, "\\'")}', this)">${esc(t)}</button>`).join('');
 }
-
-function filterCat(tag, btn) {
-  document.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('on'));
+function renderArticles(articles){
+  const el = document.getElementById('content');
+  if(!articles.length){
+    el.innerHTML = '<div class="loader">No articles found.</div>';
+    document.getElementById('ticker-inner').innerHTML = '<span>No headlines available</span>';
+    return;
+  }
+  const sorted = [...articles].sort((a,b)=>new Date(b.pubDate||0)-new Date(a.pubDate||0));
+  let html = `<div class="sec-title">Top Stories</div>`;
+  sorted.slice(0,2).forEach(a=> html += heroHTML(a, allArticles.indexOf(a)));
+  if(sorted.length > 2){
+    html += `<div class="sec-title">Latest News</div><div class="news-grid">`;
+    sorted.slice(2).forEach(a=> html += cardHTML(a, allArticles.indexOf(a)));
+    html += `</div>`;
+  }
+  el.innerHTML = html;
+  document.getElementById('ticker-inner').innerHTML = sorted.slice(0,12).map(a => `<span onclick="openArticle(${allArticles.indexOf(a)})">${esc(a.title)}</span>`).join('');
+  buildChips(articles);
+}
+function filterCat(tag, btn){
+  document.querySelectorAll('.cat-chip').forEach(x => x.classList.remove('on'));
   if (btn) btn.classList.add('on');
-  renderArticles(tag ? allArticles.filter(a => a.tag === tag) : allArticles);
+  const filtered = tag ? allArticles.filter(a => a.tag === tag) : allArticles;
+  renderArticles(filtered);
 }
-
-/* ─── LOAD ─── */
-async function loadTab(tab) {
-  clearInterval(autoTimer);
-  currentTab = tab;
+async function loadTab(tab){
   document.getElementById('content').innerHTML = '<div class="loader"><div class="spinner"></div>Loading news...</div>';
-  try {
+  try{
     const res = await fetch('/api/news?tab=' + encodeURIComponent(tab));
-    if (!res.ok) throw new Error('Server error ' + res.status);
+    if(!res.ok) throw new Error('Server error ' + res.status);
     const data = await res.json();
     allArticles = data.articles || [];
     renderArticles(allArticles);
-  } catch (err) {
-    document.getElementById('content').innerHTML =
-      '<div class="error-box"><h3>Could not load news</h3><p>' + esc(err.message) + '</p>' +
-      '<button class="retry-btn" onclick="loadTab(\'' + tab + '\')">Try Again</button></div>';
+  }catch(err){
+    document.getElementById('content').innerHTML = `
+      <div class="error-box">
+        <h3>Could not load news</h3>
+        <p>${esc(err.message)}</p>
+        <button class="retry-btn" onclick="loadTab('${tab}')">Try Again</button>
+      </div>`;
   }
-  autoTimer = setInterval(() => loadTab(currentTab), 5 * 60 * 1000);
 }
-
-function switchTab(tab, el) {
+function switchTab(tab, el){
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   loadTab(tab);
 }
-
-/* ─── MODAL ─── */
-function openArticle(idx) {
-  const a = allArticles[idx]; if (!a) return;
-  const overlay = document.getElementById('overlay');
-  overlay.classList.add('open');
+function openArticle(idx){
+  const a = allArticles[idx];
+  if(!a) return;
+  document.getElementById('overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
-  overlay.scrollTop = 0;
-
-  const paragraphs = (a.body || '').split(/\n\n+/).filter(Boolean)
-    .map(p => '<p>' + esc(p) + '</p>').join('');
-
-  let heroImg = '';
-  if (a.imgUrl) {
-    heroImg = '<img class="modal-hero-img" src="' + esc(a.imgUrl) + '" alt="' + esc(a.title) + '" onerror="this.style.display=\'none\'">';
-  }
-
-  document.getElementById('modal-inner').innerHTML =
-    heroImg +
-    '<div class="modal-body">' +
-      '<span class="modal-tag" style="' + ts(a.color) + '">' + esc(a.tag) + '</span>' +
-      '<div class="modal-title">' + esc(a.title) + '</div>' +
-      '<div class="modal-meta">' + timeAgo(a.pubDate) + '</div>' +
-      '<div class="article-wrap">' + (paragraphs || '<p>Article content unavailable.</p>') + '</div>' +
-    '</div>';
+  const paragraphs = (a.body || '').split(/\n\n+/).filter(Boolean).map(p => `<p>${esc(p)}</p>`).join('');
+  document.getElementById('modal-inner').innerHTML = `
+    <div class="modal-body">
+      <span class="modal-tag" style="${ts(a.color)}">${esc(a.tag)}</span>
+      <div class="modal-title">${esc(a.title)}</div>
+      <div class="modal-meta">${timeAgo(a.pubDate)}</div>
+      <div class="article-wrap">${paragraphs}</div>
+    </div>
+  `;
 }
+function closeModal(){ document.getElementById('overlay').classList.remove('open'); document.body.style.overflow=''; }
+function bgClose(e){ if(e.target === document.getElementById('overlay')) closeModal(); }
 
-function closeModal() {
-  document.getElementById('overlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function bgClose(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-document.getElementById('search').addEventListener('input', function() {
+document.getElementById('search').addEventListener('input', function(){
   const q = this.value.trim().toLowerCase();
-  renderArticles(q
-    ? allArticles.filter(a => a.title.toLowerCase().includes(q) || (a.desc || '').toLowerCase().includes(q))
-    : allArticles);
+  const filtered = q ? allArticles.filter(a => a.title.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q)) : allArticles;
+  renderArticles(filtered);
 });
 
-/* ─── INIT ─── */
 updateClock();
 setInterval(updateClock, 60000);
 loadTab('all');
